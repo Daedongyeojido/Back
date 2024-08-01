@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import *
 
 # Create your models here.
 class Route(models.Model):
@@ -16,13 +17,12 @@ class Route(models.Model):
 
 class Place(models.Model):
   place_id = models.AutoField(primary_key=True)
-  route_id = models.ForeignKey(Route, on_delete=models.CASCADE)
   place_name = models.CharField(max_length=50)
   place_address = models.CharField(max_length=50)
   place_like = models.IntegerField()
   place_x = models.IntegerField()
   place_y = models.IntegerField()
-  category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
+  # category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
   subcategory_id = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
 
 class Route_places(models.Model):
