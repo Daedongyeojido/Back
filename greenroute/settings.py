@@ -43,9 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'route',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'category',
+    'hashtag',
 ]
 
 MIDDLEWARE = [
