@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import *
+from category.models import *
 
 # Create your models here.
 class Route(models.Model):
@@ -22,7 +23,6 @@ class Place(models.Model):
   place_like = models.IntegerField()
   place_x = models.IntegerField()
   place_y = models.IntegerField()
-  # category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
   subcategory_id = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
 
 class Route_places(models.Model):
