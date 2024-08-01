@@ -31,6 +31,7 @@ DATABASES = {
 }
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+ALLOWED_HOSTS.append('jykim1428.pythonanywhere.com')
 
 # Application definition
 
@@ -165,3 +166,4 @@ CORS_ALLOW_HEADERS = [
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_PREFLIGHT_MAX_AGE = 86400
+
