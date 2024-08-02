@@ -18,9 +18,11 @@ class categorySave(APIView):
         
 
 class subCategorySave(APIView):
-    def post(self, request):
-        subCategorySerializer = subCategorySerializer(data=request.data)
+    def post(self, request, cId):
+        category = Category.objects.get(category_id=cId)
+        subCategorySerializer = SubCategorySerializer(data=request.data)
 
         if subCategorySerializer.is_valid(raise_exception=True):
-            subCategorySerializer.save()
+            subCategorySerializer.save(category=category)
             return Response({"message" : request.data})
+        return Response(subCategorySerializer.errors, status=status.HTTP_400_BAD_REQUEST)

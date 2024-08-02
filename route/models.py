@@ -21,9 +21,8 @@ class Place(models.Model):
   place_name = models.CharField(max_length=50)
   place_address = models.CharField(max_length=50)
   place_like = models.IntegerField()
-  place_x = models.IntegerField()
-  place_y = models.IntegerField()
-  # category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
+  place_latitude = models.FloatField()
+  place_longitude = models.FloatField()
   subcategory_id = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
 
 class Route_places(models.Model):
