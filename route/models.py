@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import *
+from category.models import *
 
 # Create your models here.
 class Route(models.Model):
