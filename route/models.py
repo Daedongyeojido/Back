@@ -19,11 +19,11 @@ class Route(models.Model):
 class Place(models.Model):
   place_id = models.AutoField(primary_key=True)
   place_name = models.CharField(max_length=50)
-  place_address = models.CharField(max_length=50)
+  place_address = models.CharField(max_length=100)
   place_like = models.IntegerField()
-  place_x = models.IntegerField()
-  place_y = models.IntegerField()
-  subcategory_id = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+  place_latitude = models.FloatField()
+  place_longitude = models.FloatField()
+  subCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
 
 class Route_places(models.Model):
   route_places_id = models.AutoField(primary_key=True)
