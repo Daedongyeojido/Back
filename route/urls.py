@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import PlaceRecommendationAPIView
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('place-recommendations/', PlaceRecommendationAPIView.as_view(), name='place-recommendations'),
 ]
