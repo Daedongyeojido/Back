@@ -135,3 +135,29 @@ class PlaceRecommendationAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class RemovePlaceFromRouteAPIView(APIView):
+    def delete(self, request, format=None):
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': '인증이 필요합니다'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        route_id = request.query_params.get('route_id')
+        place_id = request.query_params.get('place_id')
+
+        if not route_id or not place_id:
+            return Response({'error': 'route_id와 place_id가 필요합니다'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            route = Route.objects.get(route_id=route_id, user_id=user)
+            place = Place.objects.get(place_id=place_id)
+        except Route.DoesNotExist:
+            return Response({'error': '유효하지 않은 route_id'}, status=status.HTTP_404_NOT_FOUND)
+        except Place.DoesNotExist:
+            return Response({'error': '유효하지 않은 place_id'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            route_place = Route_places.objects.get(route=route, place=place)
+            route_place.delete()
+            return Response({'message': '삭제 성공'}, status=status.HTTP_200_OK)
+        except Route_places.DoesNotExist:
+            return Response({'error': '해당 route_id와 place_id의 연결이 존재하지 않습니다'}, status=status.HTTP_404_NOT_FOUND)
