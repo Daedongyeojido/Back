@@ -1,17 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Place, SubCategory, Route, Route_places
-from users.models import MyUser
-from .serializers import RouteRecommendationInputSerializer
+from .models import *
+from .serializers import *
 import math
 from collections import deque
 from django.utils import timezone
-from django.db.models import Q
 
 def calculate_distance(coord1, coord2):
-    R = 6371.0  # 지구의 평균 반지름 (단위: km)
+    R = 6371.0  # 지구의 평균 반지름 (km)
     lat1, lon1 = math.radians(coord1[0]), math.radians(coord1[1])
     lat2, lon2 = math.radians(coord2[0]), math.radians(coord2[1])
     dlon = lon2 - lon1
@@ -26,7 +24,7 @@ def is_within_ellipse(coord, focus1, focus2, major_axis):
     return dist_to_foci <= major_axis
 
 def classify_and_sort_places(places, start_point, end_point, major_axis):
-    categorized_places = {'운동': [], '휴식': [], '문화': [], '식사': []}
+    categorized_places = {'식사': [], '휴식': [], '문화': [], '운동': []}
     
     for place in places:
         coord = (place['place_latitude'], place['place_longitude'])
@@ -45,7 +43,7 @@ def classify_and_sort_places(places, start_point, end_point, major_axis):
 def generate_balanced_recommendation(categorized_places, start_point, max_recommendations=5):
     queues = {k: deque(v) for k, v in categorized_places.items()}
     recommendation = []
-    place_order = ['운동', '휴식', '문화', '식사']
+    place_order = ['식사', '휴식', '문화', '운동']
     
     current_point = start_point
     
@@ -69,7 +67,7 @@ class PlaceRecommendationAPIView(APIView):
         
         user = request.user
         if not user.is_authenticated:
-            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': '인증이 필요합니다'}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = RouteRecommendationInputSerializer(data=request.data)
         if serializer.is_valid():
@@ -79,32 +77,36 @@ class PlaceRecommendationAPIView(APIView):
             distance_start_to_end = calculate_distance(start_point, end_point)
             major_axis = distance_start_to_end * 1.5
 
-            # 제한된 반경 내의 장소만 검색 (예: 10km 반경)
-            radius = 10  # 반경 (단위: km)
+            # 제한된 반경 내의 장소만 검색
+            radius = 10  # 반경 ( km)
             start_lat, start_lon = start_point
             lat_range = (start_lat - (radius / 110.574), start_lat + (radius / 110.574))
             lon_range = (start_lon - (radius / (111.320 * math.cos(math.radians(start_lat)))), start_lon + (radius / (111.320 * math.cos(math.radians(start_lat)))))
             
             # 제외할 카테고리 필터링
-            avoid_categories = data['avoid_categories']
-            excluded_subcategories = SubCategory.objects.filter(subCategory_name__in=avoid_categories)
-            excluded_subcategory_ids = excluded_subcategories.values_list('subCategory_id', flat=True)
-            
-            # 장소 데이터 불러오기 (반경 필터링 추가)
-            places = Place.objects.exclude(
-                subCategory_id__in=excluded_subcategory_ids
-            ).filter(
-                place_latitude__range=lat_range,
-                place_longitude__range=lon_range
-            ).select_related('subCategory__category').values('place_latitude', 'place_longitude', 'place_name', 'place_address', 'subCategory__subCategory_name', 'subCategory__category__category_name')
-            
+            avoid_categories = data.get('avoid_categories', [])
+            if avoid_categories:
+                excluded_subcategories = SubCategory.objects.filter(subCategory_name__in=avoid_categories)
+                excluded_subcategory_ids = excluded_subcategories.values_list('subCategory_id', flat=True)
+                
+                places = Place.objects.exclude(
+                    subCategory_id__in=excluded_subcategory_ids
+                ).filter(
+                    place_latitude__range=lat_range,
+                    place_longitude__range=lon_range
+                ).select_related('subCategory__category').values('place_latitude', 'place_longitude', 'place_name', 'place_address', 'subCategory__subCategory_name', 'subCategory__category__category_name')
+            else:
+                places = Place.objects.filter(
+                    place_latitude__range=lat_range,
+                    place_longitude__range=lon_range
+                ).select_related('subCategory__category').values('place_latitude', 'place_longitude', 'place_name', 'place_address', 'subCategory__subCategory_name', 'subCategory__category__category_name')
+
             categorized_places = classify_and_sort_places(places, start_point, end_point, major_axis)
             recommendation = generate_balanced_recommendation(categorized_places, start_point, max_recommendations=5)
             
-            map_pins = [{"location": f"point{i+1}", "latitude": place['place_latitude'], "longitude": place['place_longitude'], "description": place['place_name']} for i, place in enumerate(recommendation)]
-            places_response = [{"address": place['place_address'], "category": place['subCategory__category__category_name'], "name": place['place_name']} for place in recommendation]
+            map_pins = [{"id": i+1, "latitude": place['place_latitude'], "longitude": place['place_longitude']} for i, place in enumerate(recommendation)]
+            places_response = [{"place_name": place['place_name'], "place_address": place['place_address'], "subCategory": place['subCategory__subCategory_name']} for place in recommendation]
             
-            # 경로 및 장소 정보 저장
             user = request.user  # 현재 로그인된 사용자
             route = Route.objects.create(
                 startpoint_name=data['startpoint_name'],
@@ -125,7 +127,6 @@ class PlaceRecommendationAPIView(APIView):
             
             response_data = {
                 "route": {
-                    "start_to_end_distance": distance_start_to_end,
                     "map_pins": map_pins,
                     "places": places_response
                 }
@@ -133,3 +134,4 @@ class PlaceRecommendationAPIView(APIView):
             
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

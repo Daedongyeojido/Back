@@ -10,7 +10,7 @@ class RouteRecommendationInputSerializer(serializers.Serializer):
     endpoint_address = serializers.CharField(max_length=50)
     endpoint_x = serializers.FloatField()
     endpoint_y = serializers.FloatField()
-    avoid_categories = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+    avoid_categories = serializers.ListField(child=serializers.CharField(),required=False, allow_empty=True)
 
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
