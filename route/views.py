@@ -10,6 +10,32 @@ from collections import deque
 from django.utils import timezone
 from django.db.models import Q
 
+def index(request):
+    return HttpResponse("Hello, this is the route app.")
+
+
+
+# class RouteDetail(APIView):
+#     def get(self, request, route_id):
+#         route = Route.objects.get(route_id=route_id)
+#         serializer = RouteSerializer(route)
+#         return Response(serializer)
+
+
+# class RouteList(APIView):
+#     def get(self, request):
+        # user = 
+        # route = Route.objects.filter(user_id=user)
+
+        # serializer = RouteSerializer(route, many=True)
+        # return Response(serializer.data)
+
+
+# class RouteHashtag(APIView):
+#     def post(self, request, route_id, hashtag_id):
+#         route = Route.objects.get(route_id=route_id)
+
+
 def calculate_distance(coord1, coord2):
     R = 6371.0  # 지구의 평균 반지름 (단위: km)
     lat1, lon1 = math.radians(coord1[0]), math.radians(coord1[1])
@@ -133,3 +159,4 @@ class PlaceRecommendationAPIView(APIView):
             
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
