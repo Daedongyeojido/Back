@@ -8,7 +8,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
-    category = serializers.ReadOnlyField(source = 'category.id')
+    category = serializers.ReadOnlyField(source = 'category.category_id')
 
     class Meta:
         model = SubCategory

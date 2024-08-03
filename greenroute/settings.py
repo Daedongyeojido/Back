@@ -138,13 +138,12 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'users.MyUser'
 
 # CORS 설정
-CORS_ALLOW_ALL_ORIGINS = [
+CORS_ALLOW_ALL_ORIGINS = True
+
+'''[
     'https://jykim1428.pythonanywhere.com/',
     'http://localhost:3000', 
-    '127.0.0.1:3000',
-    'http://localhost:8000',
-
-]
+]'''
 
 CORS_ALLOW_METHODS = [
     'DELETE',
