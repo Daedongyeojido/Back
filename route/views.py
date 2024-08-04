@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -163,3 +163,16 @@ class RemovePlaceFromRouteAPIView(APIView):
             return Response({'message': '삭제 성공'}, status=status.HTTP_200_OK)
         except Route_places.DoesNotExist:
             return Response({'error': '해당 route_id와 place_id의 연결이 존재하지 않습니다'}, status=status.HTTP_404_NOT_FOUND)
+
+# 메인 장소 순위 api
+def top_recommended_places(request):
+    top_places = Place.objects.order_by('-place_like')[:3]
+    places_data = [
+        {
+            "place_name": place.place_name,
+            "place_address": place.place_address,
+            "place_like": place.place_like
+        }
+        for place in top_places
+    ]
+    return JsonResponse({"top_recommended_places": places_data})
