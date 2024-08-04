@@ -15,7 +15,7 @@ class RouteRecommendationInputSerializer(serializers.Serializer):
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
-        fields = ['place_x', 'place_y', 'place_name', 'subcategory_id__subcategory_name']
+        fields = ['place_latitude', 'place_longitude', 'place_name', 'subcategory_id__subcategory_name']
 
 class RecommendationResponseSerializer(serializers.Serializer):
     map_pins = serializers.ListField(child=serializers.DictField())
