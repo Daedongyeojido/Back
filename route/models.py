@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import MyUser
 from category.models import SubCategory
+from hashtag.models import Hashtag
 
 class Route(models.Model):
     route_id = models.AutoField(primary_key=True)
@@ -15,6 +16,7 @@ class Route(models.Model):
     date = models.DateField()
     user_id = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     places = models.ManyToManyField('Place', through='Route_places', related_name='routes')
+    # hashtag = models.ManyToManyField(Hashtag, through='Route_Hashtag', related_name='route')
 
 
 class Place(models.Model):
@@ -32,3 +34,7 @@ class Route_places(models.Model):
     route = models.ForeignKey(Route, on_delete=models.CASCADE)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, null=True)
     user_like = models.BooleanField()
+
+# class Route_Hashtag(models.Model):
+#     route = models.ForeignKey(Route, on_delete=models.CASCADE)
+#     hashtag = models.ForeignKey(Hashtag, on_delete=models.CASCADE)

@@ -20,3 +20,9 @@ class PlaceSerializer(serializers.ModelSerializer):
 class RecommendationResponseSerializer(serializers.Serializer):
     map_pins = serializers.ListField(child=serializers.DictField())
     places = serializers.ListField(child=serializers.DictField())
+
+
+class RouteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Route
+        fields = '__all__'

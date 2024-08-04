@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.response import Response # type: ignore
+from rest_framework.views import APIView # type: ignore
 from .models import *
 from .serializers import *
 import math
@@ -163,3 +163,14 @@ class RemovePlaceFromRouteAPIView(APIView):
             return Response({'message': '삭제 성공'}, status=status.HTTP_200_OK)
         except Route_places.DoesNotExist:
             return Response({'error': '해당 route_id와 place_id의 연결이 존재하지 않습니다'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class RouteDetail(APIView):
+    def get(self, request, route_id):
+        try:
+            route = Route.objects.get(route_id=route_id)
+        except Route.DoesNotExist:
+            return Response({"error" : "유효하지 않은 route_id"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = RouteSerializer(route)
+        return Response(serializer.data)
