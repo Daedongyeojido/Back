@@ -15,6 +15,8 @@ class Route(models.Model):
   endpoint_y = models.IntegerField()
   date = models.DateField()
   user_id = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+  places = models.ManyToManyField('Place', through='Route_Places', related_name='routes')
+
 
 class Place(models.Model):
   place_id = models.AutoField(primary_key=True)
@@ -27,5 +29,6 @@ class Place(models.Model):
 
 class Route_places(models.Model):
   route_places_id = models.AutoField(primary_key=True)
-  route_id = models.ForeignKey(Route, on_delete=models.CASCADE)
+  route = models.ForeignKey(Route, on_delete=models.CASCADE)
+  place = models.ForeignKey(Place, on_delete=models.CASCADE, null=True)
   user_like = models.BooleanField()
