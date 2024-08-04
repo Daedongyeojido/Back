@@ -62,6 +62,7 @@ def generate_balanced_recommendation(categorized_places, start_point, max_recomm
     
     return recommendation
 
+# 추천 경로 api
 class PlaceRecommendationAPIView(APIView):
     def post(self, request, format=None):
         
@@ -135,6 +136,7 @@ class PlaceRecommendationAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# 추천 경로 삭제 api
 class RemovePlaceFromRouteAPIView(APIView):
     def delete(self, request, format=None):
         user = request.user

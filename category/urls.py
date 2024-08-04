@@ -2,6 +2,8 @@ from django.urls import path, include
 from .views import *
 
 urlpatterns = [
-    path('', categorySave.as_view()),
-    path('subCategory/<int:cId>', subCategorySave.as_view()),
+    path('', CategorySave.as_view()),
+    path('subCategory/<int:cId>', SubCategorySave.as_view()),
+    path('categoryList/', CategoryList.as_view()),
+    path('categoryInfo/<int:pk>', CategoryInfo.as_view())
 ]
