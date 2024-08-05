@@ -32,7 +32,6 @@ DATABASES = {
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 ALLOWED_HOSTS.append('jykim1428.pythonanywhere.com')
-ALLOWED_HOSTS.append('AHFAH.pythonanywhere.com')
 ALLOWED_HOSTS.append('localhost:3000')
 
 # Application definition
