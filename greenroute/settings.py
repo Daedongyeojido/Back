@@ -32,6 +32,7 @@ DATABASES = {
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 ALLOWED_HOSTS.append('jykim1428.pythonanywhere.com')
+ALLOWED_HOSTS.append('localhost:3000')
 
 # Application definition
 
@@ -138,7 +139,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'users.MyUser'
 
 # CORS 설정
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
 '''[
     'https://jykim1428.pythonanywhere.com/',
