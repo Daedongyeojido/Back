@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from hashtag.serializers import *
 
 class RouteRecommendationInputSerializer(serializers.Serializer):
     startpoint_name = serializers.CharField(max_length=50)
@@ -15,7 +16,7 @@ class RouteRecommendationInputSerializer(serializers.Serializer):
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
-        fields = ['place_latitude', 'place_longitude', 'place_name', 'subcategory_id__subcategory_name']
+        fields = ['place_id', 'place_latitude', 'place_longitude', 'place_name', 'place_address', 'place_like', 'subCategory']
 
 class RecommendationResponseSerializer(serializers.Serializer):
     map_pins = serializers.ListField(child=serializers.DictField())
@@ -23,6 +24,10 @@ class RecommendationResponseSerializer(serializers.Serializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
+    places = PlaceSerializer(many=True, read_only=True)
+    hashtag = HashtagSerializer(many=True, read_only=True)
+
     class Meta:
         model = Route
-        fields = '__all__'
+        fields = ['startpoint_name', 'startpoint_address', 'endpoint_name', 'endpoint_address', 'places', 'hashtag']
+

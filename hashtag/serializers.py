@@ -4,4 +4,4 @@ from rest_framework import serializers
 class HashtagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hashtag
-        fields = '__all__'
+        fields = ['id', 'name']

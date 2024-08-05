@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response # type: ignore
 from rest_framework.views import APIView # type: ignore
@@ -165,6 +165,22 @@ class RemovePlaceFromRouteAPIView(APIView):
             return Response({'error': '해당 route_id와 place_id의 연결이 존재하지 않습니다'}, status=status.HTTP_404_NOT_FOUND)
 
 
+# 메인 장소 순위 api
+def top_recommended_places(request):
+    top_places = Place.objects.order_by('-place_like')[:3]
+    places_data = [
+        {
+            "place_name": place.place_name,
+            "place_address": place.place_address,
+            "place_like": place.place_like
+        }
+        for place in top_places
+    ]
+    return JsonResponse({"top_recommended_places": places_data})
+
+
+
+# route 상세 보기
 class RouteDetail(APIView):
     def get(self, request, route_id):
         try:
@@ -174,3 +190,81 @@ class RouteDetail(APIView):
         
         serializer = RouteSerializer(route)
         return Response(serializer.data)
+
+
+# user의 route list 반환
+class RouteList(APIView):
+    def get(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': '인증이 필요합니다'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        route = Route.objects.filter(user_id=user)
+
+        routeSerializer = RouteSerializer(route, many=True)
+
+        return Response(routeSerializer.data)
+
+
+
+
+
+class PlaceLike(APIView):
+    def post(self, request, route_id, place_id):
+
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': '인증이 필요합니다'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not route_id or not place_id:
+            return Response({'error': 'route_id와 place_id가 필요합니다'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            route = Route.objects.get(route_id=route_id, user_id=user)
+            place = Place.objects.get(place_id=place_id)
+        except Route.DoesNotExist:
+            return Response({'error': '유효하지 않은 route_id'}, status=status.HTTP_404_NOT_FOUND)
+        except Place.DoesNotExist:
+            return Response({'error': '유효하지 않은 place_id'}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            route_place = Route_places.objects.get(route=route, place=place)
+        except Route_places.DoesNotExist:
+            return Response({'error': '해당하는 place가 존재하지 않습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        route_place.user_like = True
+        place.place_like += 1
+
+        route_place.save()
+        place.save()
+
+        return Response({'place_like' : place.place_like, 'user_like' : route_place.user_like}, status=status.HTTP_200_OK)
+    
+    def delete(self, request, route_id, place_id):
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': '인증이 필요합니다'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not route_id or not place_id:
+            return Response({'error': 'route_id와 place_id가 필요합니다'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            route = Route.objects.get(route_id=route_id, user_id=user)
+            place = Place.objects.get(place_id=place_id)
+        except Route.DoesNotExist:
+            return Response({'error': '유효하지 않은 route_id'}, status=status.HTTP_404_NOT_FOUND)
+        except Place.DoesNotExist:
+            return Response({'error': '유효하지 않은 place_id'}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            route_place = Route_places.objects.get(route=route, place=place)
+        except Route_places.DoesNotExist:
+            return Response({'error': '해당하는 place가 존재하지 않습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        route_place.user_like = False
+        place.place_like -= 1
+
+        route_place.save()
+        place.save()
+
+        return Response({'place_like' : place.place_like, 'user_like' : route_place.user_like}, status=status.HTTP_200_OK)

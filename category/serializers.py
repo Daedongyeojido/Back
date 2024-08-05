@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Category, SubCategory
 
 class SubCategorySerializer(serializers.ModelSerializer):
-    category = serializers.ReadOnlyField(source = 'category.category_id')
+    # category = serializers.ReadOnlyField(source = 'category.category_id')
 
     class Meta:
         model = SubCategory

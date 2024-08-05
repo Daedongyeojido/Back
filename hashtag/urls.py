@@ -2,5 +2,6 @@ from django.urls import path, include
 from .views import *
 
 urlpatterns = [
-    path('', HashtagView.as_view())
+    path('hashtagList', HashtagView.as_view()),
+    path('routes/<int:route_id>/hashtag/<int:hashtag_id>', RouteHashtag.as_view())
 ]
