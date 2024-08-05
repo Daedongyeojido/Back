@@ -142,10 +142,7 @@ AUTH_USER_MODEL = 'users.MyUser'
 # CORS 설정
 # CORS_ALLOW_ALL_ORIGINS = True
 
-'''[
-    'https://jykim1428.pythonanywhere.com/',
-    'http://localhost:3000', 
-]'''
+ALLOWED_HOSTS = []
 
 CORS_ALLOW_METHODS = [
     'DELETE',
